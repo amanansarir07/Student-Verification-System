@@ -1,0 +1,21 @@
+student_id,see_symbol_no,name_en,name_np,student_email,father_name,mother_name,dob_bs,dob_ad,gender,school_code,permanent_address
+SEE-2081-0001,2081-1029-A001,Aman Aansari,अमन अंसारी,aman.ansari@example.edu.np,Karim Ansari,Ruksana Ansari,2058-03-12,2001-06-25,Male,SCH-1029,Biratnagar-8 Morang
+SEE-2081-0002,2081-1031-S014,Sita Rai,सीता राई,sita.rai@example.edu.np,Madan Rai,Laxmi Rai,2059-01-10,2002-04-23,Female,SCH-1031,Dharan-12 Sunsari
+SEE-2081-0003,2081-1029-R042,Rohan Thapa,रोहन थापा,rohan.thapa@example.edu.np,Bikash Thapa,Maya Thapa,2058-07-15,2001-10-31,Male,SCH-1029,Kathmandu-16 Kathmandu
+SEE-2081-0004,2081-1040-P018,Pratikshya Karki,प्रतिक्षा कार्की,pratiksha.karki@example.edu.np,Dinesh Karki,Sabita Karki,2058-11-04,2002-02-16,Female,SCH-1040,Lalitpur-3 Lalitpur
+SEE-2081-0005,2081-1029-B027,Bishal Tamang,विशाल तामाङ,bishal.tamang@example.edu.np,Nima Tamang,Dawa Tamang,2059-05-22,2002-09-07,Male,SCH-1029,Hetauda-4 Makwanpur
+SEE-2081-0006,2081-1055-N006,Nisha Shrestha,निशा श्रेष्ठ,nisha.shrestha@example.edu.np,Rajesh Shrestha,Anita Shrestha,2058-09-18,2002-01-02,Female,SCH-1055,Kathmandu-6 Kathmandu
+SEE-2081-0007,2081-1031-S033,Sujan Gurung,सुजन गुरुङ,sujan.gurung@example.edu.np,Tek Gurung,Kamala Gurung,2059-02-06,2002-05-20,Male,SCH-1031,Pokhara-10 Kaski
+SEE-2081-0008,2081-1040-A051,Aarati Shah,आरती शाह,aarati.shah@example.edu.np,Mohan Shah,Puja Shah,2058-12-27,2002-04-09,Female,SCH-1040,Janakpur-5 Dhanusha
+SEE-2081-0009,2081-1062-D019,Dipesh Bista,दिपेश बिष्ट,dipesh.bista@example.edu.np,Hari Bista,Goma Bista,2059-06-14,2002-09-30,Male,SCH-1062,Dhangadhi-2 Kailali
+SEE-2081-0010,2081-1055-M044,Mina Lama,मिना लामा,mina.lama@example.edu.np,Pasang Lama,Chhiring Lama,2058-04-30,2001-08-14,Female,SCH-1055,Bhaktapur-1 Bhaktapur
+SEE-2081-0011,2081-1029-K071,Kiran Khadka,किरण खड्का,kiran.khadka@example.edu.np,Surya Khadka,Radha Khadka,2059-08-03,2002-11-19,Male,SCH-1029,Butwal-9 Rupandehi
+SEE-2081-0012,2081-1062-P064,Pooja Mandal,पूजा मण्डल,pooja.mandal@example.edu.np,Ramesh Mandal,Sunita Mandal,2058-10-21,2002-02-04,Female,SCH-1062,Birgunj-11 Parsa
+SEE-2081-0013,2081-1040-R039,Rabin Magar,रबिन मगर,rabin.magar@example.edu.np,Keshar Magar,Bimala Magar,2059-03-28,2002-07-12,Male,SCH-1040,Tansen-5 Palpa
+SEE-2081-0014,2081-1031-S052,Samjhana Neupane,सम्झना न्यौपाने,samjhana.neupane@example.edu.np,Narayan Neupane,Saraswati Neupane,2058-06-10,2001-09-25,Female,SCH-1031,Bharatpur-7 Chitwan
+SEE-2081-0015,2081-1055-A029,Anil Chaudhary,अनिल चौधरी,anil.chaudhary@example.edu.np,Ram Chaudhary,Fulmati Chaudhary,2059-09-17,2003-01-01,Male,SCH-1055,Ghorahi-15 Dang
+SEE-2081-0016,2081-1029-B058,Binita Adhikari,बिनिता अधिकारी,binita.adhikari@example.edu.np,Gopal Adhikari,Meena Adhikari,2058-05-03,2001-08-19,Female,SCH-1029,Damak-6 Jhapa
+SEE-2081-0017,2081-1062-S022,Sandip Yadav,सन्दीप यादव,sandip.yadav@example.edu.np,Mahesh Yadav,Geeta Yadav,2059-12-11,2003-03-25,Male,SCH-1062,Rajbiraj-3 Saptari
+SEE-2081-0018,2081-1040-R073,Ritika Pandey,रितिका पाण्डे,ritika.pandey@example.edu.np,Ashok Pandey,Sangita Pandey,2058-01-25,2001-05-08,Female,SCH-1040,Nepalgunj-12 Banke
+SEE-2081-0019,2081-1055-S081,Sagar Basnet,सागर बस्नेत,sagar.basnet@example.edu.np,Umesh Basnet,Kalpana Basnet,2059-07-07,2002-10-24,Male,SCH-1055,Itahari-2 Sunsari
+SEE-2081-0020,2081-1031-M095,Manisha KC,मनिषा केसी,manisha.kc@example.edu.np,Prakash KC,Januka KC,2058-02-19,2001-06-02,Female,SCH-1031,Baglung-4 Baglung
