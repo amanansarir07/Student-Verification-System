@@ -1,6 +1,6 @@
 # Student Record Verification System
 
-A web-based verification workflow for checking Class 11/12 student registration records against official SEE/Class 10 master records before final submission to NEB/IEMIS.
+A web-based verification workflow for checking Class 12 student registration records against official SEE/Class 10 master records before final submission to NEB/IEMIS.
 
 The system is designed for a government or education-board workflow where schools submit student data, mismatches are flagged early, students can correct issues through secure links, and only verified records are dispatched to the board.
 
