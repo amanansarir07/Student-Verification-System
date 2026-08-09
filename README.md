@@ -23,9 +23,18 @@ This system reduces that risk by checking submitted registration data before fin
 9. Admin re-verifies and submits final approved data to board dispatch.
 10. Audit trail records the full lifecycle.
 
+## Verification Control Center
+
+The admin dashboard is designed as an operational control center for education administrators. It keeps the current state and the next required action visible without changing the underlying workflow.
+
+- **Verification pipeline:** Submitted, Verification, and Dispatch are shown as connected, clickable workflow stages.
+- **Attention area:** Flagged cases are surfaced directly below the pipeline with the active case count, highest recorded risk level, and the number awaiting administrator or student action.
+- **Status semantics:** Green indicates verified records, amber indicates pending attention, and crimson indicates high-risk exceptions.
+- **Responsive layout:** Long identifiers, tables, action controls, and case information are contained or wrapped for narrow screens; data tables retain horizontal scrolling when required for readability.
+
 ## Features
 
-- Government-style admin portal
+- Government-style Verification Control Center dashboard
 - Admin login
 - Student correction portal without student login
 - Secure student ticket links with token and expiry
@@ -97,6 +106,12 @@ Student-Verification-System/
     src/
       App.jsx
       App.css
+      components/
+        AdminDashboard.jsx
+        CaseReview.jsx
+        RegistrationEntry.jsx
+        BoardDispatch.jsx
+        AuditTrail.jsx
       utils.js
       utils.test.js
 ```

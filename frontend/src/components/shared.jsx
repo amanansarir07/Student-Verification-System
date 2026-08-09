@@ -1,21 +1,27 @@
 import { fieldLabels } from '../constants';
 import { formatDateTime } from '../utils';
 import StatusBadge from './StatusBadge';
+import { CheckCircle2, LoaderCircle, SearchCheck } from 'lucide-react';
 
-export function Metric({ label, value }) {
-  return (
-    <article className="metric-card">
-      <strong>{value}</strong>
-      <span>{label}</span>
-    </article>
+export function Metric({ label, value, priority = false, tone = 'default', onClick }) {
+  const className = `metric-card${priority ? ' metric-card-priority' : ''} metric-${tone}${onClick ? ' metric-card-button' : ''}`;
+  const content = <><strong>{value}</strong><span>{label}</span></>;
+
+  return onClick ? (
+    <button type="button" className={className} onClick={onClick} aria-label={`Open ${label} details`}>
+      {content}
+    </button>
+  ) : (
+    <article className={className}>{content}</article>
   );
 }
 
-export function PanelTitle({ eyebrow, title }) {
+export function PanelTitle({ eyebrow, title, description }) {
   return (
     <div className="panel-title">
       <p className="gov-mark">{eyebrow}</p>
       <h2>{title}</h2>
+      {description && <p className="panel-description">{description}</p>}
     </div>
   );
 }
@@ -23,7 +29,7 @@ export function PanelTitle({ eyebrow, title }) {
 export function ProcessingIndicator({ text, compact = false }) {
   return (
     <div className={compact ? 'processing-indicator compact' : 'processing-indicator'} role="status" aria-live="polite">
-      <span className="loading-ring" aria-hidden="true" />
+      <LoaderCircle className="loading-icon" aria-hidden="true" size={18} />
       <strong>{text}</strong>
     </div>
   );
@@ -32,6 +38,7 @@ export function ProcessingIndicator({ text, compact = false }) {
 export function OfficialState({ title, text, compact = false }) {
   return (
     <div className={compact ? 'official-state compact' : 'official-state'}>
+      <SearchCheck aria-hidden="true" size={22} />
       <strong>{title}</strong>
       <p>{text}</p>
     </div>
@@ -51,10 +58,7 @@ export function MismatchTable({ fields }) {
             <th>Field</th>
             <th>School Entry</th>
             <th>Official Record</th>
-            <th>Rule</th>
-            <th>Confidence</th>
             <th>Risk</th>
-            <th>Severity</th>
           </tr>
         </thead>
         <tbody>
@@ -63,10 +67,7 @@ export function MismatchTable({ fields }) {
               <td>{fieldLabels[field.field] || field.field}</td>
               <td>{field.submitted_value || '-'}</td>
               <td>{field.master_value || '-'}</td>
-              <td>{field.rule}</td>
-              <td>{field.confidence_score ?? Math.round((field.similarity || 0) * 100)}%</td>
               <td><StatusBadge status={field.risk_level || 'medium'} /></td>
-              <td><StatusBadge status={field.severity} /></td>
             </tr>
           ))}
         </tbody>
@@ -120,7 +121,7 @@ export function SubmissionReceipt({ receipt, onViewCases, onViewBoard }) {
           <span />
           <span />
         </div>
-        <div className="success-seal">✓</div>
+        <div className="success-seal"><CheckCircle2 size={18} /></div>
       </div>
       <div className="receipt-main">
         <div>

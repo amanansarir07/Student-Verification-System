@@ -1,14 +1,31 @@
 import { useEffect, useMemo, useState } from 'react';
+import { AlertTriangle, ArrowRight, BarChart3, ClipboardCheck, FilePlus2, History, LogOut, RefreshCcw, Send } from 'lucide-react';
 import { API_URL } from '../config';
 import { emptyRecord } from '../constants';
 import { getApiErrorMessage } from '../utils';
 import AuditTrail from './AuditTrail';
 import BoardDispatch from './BoardDispatch';
 import CaseReview from './CaseReview';
-import DashboardTables from './DashboardTables';
 import RegistrationEntry from './RegistrationEntry';
 import StatusBadge from './StatusBadge';
-import { Metric, OfficialState, PanelTitle } from './shared';
+import { OfficialState, PanelTitle } from './shared';
+
+function PipelineStatus({ icon: Icon, label, value, detail, onClick, tone = 'default', connector = true }) {
+  return (
+    <>
+      <button type="button" className={`pipeline-status pipeline-status-${tone}`} onClick={onClick}>
+        <span className="pipeline-status-icon"><Icon size={17} aria-hidden="true" /></span>
+        <span className="pipeline-status-copy">
+          <span className="pipeline-status-label">{label}</span>
+          <strong>{value}</strong>
+          <span className="pipeline-status-detail">{detail}</span>
+        </span>
+        <ArrowRight className="pipeline-status-arrow" size={16} aria-hidden="true" />
+      </button>
+      {connector && <span className="pipeline-connector" aria-hidden="true" />}
+    </>
+  );
+}
 
 export default function AdminDashboard({ token, user, onLogout }) {
   const [dashboard, setDashboard] = useState(null);
@@ -106,7 +123,7 @@ export default function AdminDashboard({ token, user, onLogout }) {
         studentName: result.submitted?.name_en || record.name_en || 'Student record',
         message: result.status === 'approved'
           ? 'The record matched the official master record and was dispatched for board submission.'
-          : 'The record needs review. A correction ticket with SMS and Gmail notification messages has been prepared.'
+          : 'The record needs review. A correction ticket with SMS and email notification messages has been prepared.'
       });
       await loadDashboard();
     } catch (err) {
@@ -197,12 +214,12 @@ export default function AdminDashboard({ token, user, onLogout }) {
   }
 
   async function resetWorkspace() {
-    const confirmed = window.confirm('Reset all workspace submissions, cases, board dispatches, and audit events? Master SEE records will remain.');
+    const confirmed = window.confirm('Clear all evaluation submissions, cases, board dispatches, and audit events? Master SEE records will remain.');
     if (!confirmed) return;
 
     try {
       await api('/demo/reset', { method: 'POST' });
-      setNotice('Workspace data reset complete. Master SEE records were retained.');
+      setNotice('Evaluation data cleared. Master SEE records were retained.');
       setSelectedCase(null);
       setActiveSection('dashboard');
       await loadDashboard();
@@ -213,43 +230,62 @@ export default function AdminDashboard({ token, user, onLogout }) {
 
   const metrics = dashboard?.metrics || {};
   const cases = dashboard?.cases || [];
-  const submissions = dashboard?.submissions || [];
   const dispatches = dashboard?.board_dispatches || [];
   const auditEvents = dashboard?.audit_events || [];
+  const flaggedCount = metrics.flagged || cases.length || 0;
+  const riskRank = { low: 1, medium: 2, high: 3, critical: 4 };
+  const highestRisk = cases.reduce((current, item) => {
+    const caseRisk = item.verification_summary?.risk_level || 'medium';
+    return (riskRank[caseRisk] || 0) > (riskRank[current] || 0) ? caseRisk : current;
+  }, 'low');
+  const riskLabel = flaggedCount === 0 ? 'No active risk' : `${highestRisk === 'critical' ? 'Critical' : highestRisk[0].toUpperCase() + highestRisk.slice(1)} risk`;
+  const caseQueueSummary = [
+    metrics.pending_admin > 0 && `${metrics.pending_admin} awaiting administrator review`,
+    metrics.pending_student > 0 && `${metrics.pending_student} awaiting student response`
+  ].filter(Boolean).join(' · ') || 'No cases currently awaiting action';
   const permissions = new Set(user?.permissions || ['dashboard:read', 'submission:create', 'case:review', 'board:read', 'audit:read', 'workspace:reset']);
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'registration', label: 'Registration Entry', permission: 'submission:create' },
-    { id: 'cases', label: 'Flagged Cases', permission: 'case:review' },
-    { id: 'board', label: 'Board Dispatch', permission: 'board:read' },
-    { id: 'audit', label: 'Audit Trail', permission: 'audit:read' }
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'registration', label: 'Registration Entry', permission: 'submission:create', icon: FilePlus2 },
+    { id: 'cases', label: 'Flagged Cases', permission: 'case:review', icon: ClipboardCheck },
+    { id: 'board', label: 'Board Dispatch', permission: 'board:read', icon: Send },
+    { id: 'audit', label: 'Audit Trail', permission: 'audit:read', icon: History }
   ].filter(item => !item.permission || permissions.has(item.permission));
 
   return (
     <main className="portal-shell">
       <header className="site-header">
         <div className="emblem">NEB</div>
-        <div>
+        <div className="site-header-identity">
           <p className="gov-mark">Government of Nepal - Education Record Service</p>
           <h1>Student Record Verification System</h1>
-          <p>{user?.name || 'School Administration Console'} - {user?.role?.replaceAll('_', ' ') || 'Class 11/12 Registration'}</p>
+          <p className="site-header-user">{user?.name || 'School Administration Console'} - {user?.role?.replaceAll('_', ' ') || 'Class 11/12 Registration'}</p>
         </div>
         <div className="header-actions">
-          {permissions.has('workspace:reset') && <button onClick={resetWorkspace}>Reset Workspace</button>}
-          <button onClick={onLogout}>Logout</button>
+          {permissions.has('workspace:reset') && (
+            <button className="maintenance-action" onClick={resetWorkspace} title="Clear evaluation data">
+              <RefreshCcw size={16} aria-hidden="true" />
+              Clear evaluation data
+            </button>
+          )}
+          <button onClick={onLogout}><LogOut size={16} aria-hidden="true" />Logout</button>
         </div>
       </header>
 
       <nav className="portal-nav" aria-label="Portal sections">
-        {navItems.map(item => (
-          <button
-            className={activeSection === item.id ? 'active' : ''}
-            key={item.id}
-            onClick={() => setActiveSection(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
+        {navItems.map(item => {
+          const Icon = item.icon;
+          return (
+            <button
+              className={activeSection === item.id ? 'active' : ''}
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+            >
+              <Icon size={16} aria-hidden="true" />
+              {item.label}
+            </button>
+          );
+        })}
       </nav>
 
       <div className="section-container">
@@ -258,50 +294,70 @@ export default function AdminDashboard({ token, user, onLogout }) {
         {isLoading && <OfficialState title="Loading official records" text="Please wait while the verification workspace is prepared." />}
 
         {!isLoading && activeSection === 'dashboard' && (
-          <section className="section-page">
-            <PanelTitle eyebrow="System Overview" title="Verification dashboard" />
-            <div className="metric-grid">
-              <Metric label="Master SEE Records" value={metrics.master_records || 0} />
-              <Metric label="Submitted" value={metrics.total_submissions || 0} />
-              <Metric label="Approved" value={metrics.approved || 0} />
-              <Metric label="Active Flags" value={metrics.flagged || 0} />
-              <Metric label="Pending Admin" value={metrics.pending_admin || 0} />
-              <Metric label="Sent to Board" value={metrics.sent_to_board || 0} />
-              <Metric label="Avg Confidence" value={`${metrics.average_confidence || 0}%`} />
-              <Metric label="Duplicate Alerts" value={metrics.duplicate_alerts || 0} />
+          <section className="section-page dashboard-page">
+            <PanelTitle
+              eyebrow="System Overview"
+              title="Verification Control Center"
+              description="Monitor verification progress, address exceptions, and confirm board dispatch."
+            />
+            <div className="dashboard-overview">
+              <section className="verification-pipeline" aria-labelledby="pipeline-title">
+                <div className="pipeline-heading">
+                  <div>
+                    <p className="gov-mark">Current system state</p>
+                    <h3 id="pipeline-title">Verification Pipeline</h3>
+                  </div>
+                  <span className="pipeline-caption">Open a stage to continue its workflow</span>
+                </div>
+                <div className="pipeline-flow">
+                  <PipelineStatus
+                    icon={FilePlus2}
+                    label="Submitted"
+                    value={metrics.total_submissions || 0}
+                    detail="Records received"
+                    onClick={() => setActiveSection('registration')}
+                    tone="primary"
+                  />
+                  <PipelineStatus
+                    icon={ClipboardCheck}
+                    label="Verification"
+                    value={metrics.approved || 0}
+                    detail="Verified records"
+                    onClick={() => setActiveSection('board')}
+                    tone="verified"
+                  />
+                  <PipelineStatus
+                    icon={Send}
+                    label="Dispatch"
+                    value={metrics.sent_to_board || dispatches.length || 0}
+                    detail="Sent to board"
+                    onClick={() => setActiveSection('board')}
+                    tone="dispatch"
+                    connector={false}
+                  />
+                </div>
+              </section>
+              <button type="button" className={`pipeline-exception pipeline-exception-${highestRisk}`} onClick={() => setActiveSection('cases')}>
+                <span className="pipeline-exception-icon"><AlertTriangle size={17} aria-hidden="true" /></span>
+                <span className="pipeline-exception-copy">
+                  <span>Attention required</span>
+                  <strong><b>{flaggedCount}</b> {flaggedCount === 1 ? 'case requires review' : 'cases require review'}</strong>
+                  <small>{riskLabel} — review flagged records before final board dispatch.</small>
+                  <small className="case-queue-summary">{caseQueueSummary}</small>
+                </span>
+                <span className="pipeline-exception-action">Review cases <ArrowRight size={16} aria-hidden="true" /></span>
+              </button>
             </div>
-            {dashboard?.analytics && (
-              <div className="dashboard-summary-grid">
-                <section className="summary-panel">
-                  <h3>Risk distribution</h3>
-                  <div className="summary-row"><strong>Low risk</strong><span>{dashboard.analytics.risk_counts.low || 0}</span></div>
-                  <div className="summary-row"><strong>Medium risk</strong><span>{dashboard.analytics.risk_counts.medium || 0}</span></div>
-                  <div className="summary-row"><strong>High risk</strong><span>{dashboard.analytics.risk_counts.high || 0}</span></div>
-                </section>
-                <section className="summary-panel">
-                  <h3>Top error fields</h3>
-                  {dashboard.analytics.top_error_fields.length === 0 ? (
-                    <p className="empty-copy">No error patterns detected.</p>
-                  ) : dashboard.analytics.top_error_fields.slice(0, 4).map(item => (
-                    <div className="summary-row" key={item.field}>
-                      <strong>{item.field.replaceAll('_', ' ')}</strong>
-                      <span>{item.count}</span>
-                    </div>
-                  ))}
-                </section>
-                <section className="summary-panel">
-                  <h3>Dispatch control</h3>
-                  <p className="empty-copy">No Verification = No Board Dispatch is enforced by the backend before any certificate payload is created.</p>
-                </section>
-              </div>
-            )}
-            <DashboardTables cases={cases} dispatches={dispatches} submissions={submissions} />
           </section>
         )}
 
         {!isLoading && activeSection === 'registration' && (
           <section className="section-page">
-            <PanelTitle eyebrow="Registration Entry" title="Submit Class 11/12 student registration" />
+            <PanelTitle
+              eyebrow="Registration Entry"
+              title="Submit Class 11/12 student registration"
+              description="Enter one record or upload a CSV. Verified records move forward automatically."
+            />
             <RegistrationEntry
               record={record}
               setRecord={setRecord}
@@ -318,7 +374,11 @@ export default function AdminDashboard({ token, user, onLogout }) {
 
         {!isLoading && activeSection === 'cases' && (
           <section className="section-page">
-            <PanelTitle eyebrow="Verification Cases" title="Flagged records and corrections" />
+            <PanelTitle
+              eyebrow="Verification Cases"
+              title="Flagged records and corrections"
+              description="Review only records that need correction before final dispatch."
+            />
             <div className="case-layout">
               <div className="case-list-panel">
                 <h2>Case queue</h2>
@@ -326,15 +386,27 @@ export default function AdminDashboard({ token, user, onLogout }) {
                   {cases.length === 0 ? (
                     <OfficialState compact title="No flagged cases" text="All submitted records are currently clear for board dispatch." />
                   ) : cases.map(item => (
-                    <button
-                      className={`case-button ${selectedCase?.ticket_id === item.ticket_id ? 'active' : ''}`}
-                      key={item.ticket_id}
-                      onClick={() => setSelectedCase(item)}
-                    >
-                      <strong>{item.master.name_en}</strong>
-                      <span>{item.ticket_id}</span>
-                      <StatusBadge status={item.status} />
-                    </button>
+                    (() => {
+                      const mismatchCount = item.flagged_fields?.length || 0;
+                      const riskLevel = item.verification_summary?.risk_level || 'medium';
+
+                      return (
+                        <button
+                          className={`case-button ${selectedCase?.ticket_id === item.ticket_id ? 'active' : ''}`}
+                          key={item.ticket_id}
+                          onClick={() => setSelectedCase(item)}
+                          aria-label={`${item.master.name_en}, ${mismatchCount} mismatched fields, ${riskLevel} risk, ${item.status.replaceAll('_', ' ')}`}
+                        >
+                          <strong>{item.master.name_en}</strong>
+                          <span>{item.ticket_id}</span>
+                          <div className="case-button-meta">
+                            <StatusBadge status={riskLevel} />
+                            <span className="case-count">{mismatchCount} {mismatchCount === 1 ? 'mismatch' : 'mismatches'}</span>
+                          </div>
+                          <StatusBadge status={item.status} />
+                        </button>
+                      );
+                    })()
                   ))}
                 </div>
               </div>
@@ -345,14 +417,22 @@ export default function AdminDashboard({ token, user, onLogout }) {
 
         {!isLoading && activeSection === 'board' && (
           <section className="section-page">
-            <PanelTitle eyebrow="Board Dispatch" title="Final approved payloads" />
+            <PanelTitle
+              eyebrow="Board Dispatch"
+              title="Final approved payloads"
+              description="Confirm records cleared by verification before board handoff."
+            />
             <BoardDispatch dispatches={dispatches} />
           </section>
         )}
 
         {!isLoading && activeSection === 'audit' && (
           <section className="section-page">
-            <PanelTitle eyebrow="Audit Trail" title="System activity log" />
+            <PanelTitle
+              eyebrow="Audit Trail"
+              title="System activity log"
+              description="Review who changed what and when."
+            />
             <AuditTrail events={auditEvents} />
           </section>
         )}

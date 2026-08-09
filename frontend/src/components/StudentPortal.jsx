@@ -92,6 +92,7 @@ export default function StudentPortal({ ticketId, ticketToken }) {
               <label>
                 Proof document
                 <input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={event => setProof(event.target.files?.[0] || null)} />
+                <span className="field-hint">Accepted formats: PDF, JPG, or PNG. Maximum file size: 5 MB.</span>
               </label>
               <button className="primary-action" disabled={isSubmitting}>
                 {isSubmitting ? 'Submitting correction...' : 'Submit correction'}

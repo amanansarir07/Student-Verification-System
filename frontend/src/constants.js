@@ -48,7 +48,7 @@ export const fieldLabels = {
   see_symbol_no: 'SEE Symbol No.',
   name_en: 'Full Name (English)',
   name_np: 'Full Name (Nepali)',
-  student_email: 'Student Email / Gmail',
+  student_email: 'Student Email',
   father_name: 'Father Name',
   mother_name: 'Mother Name',
   dob_bs: 'DOB B.S.',

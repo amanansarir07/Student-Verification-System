@@ -62,13 +62,14 @@ function AuditEventCard({ event }) {
             <dt>Actor</dt>
             <dd>{event.actor_name}<span>{event.actor_type}</span></dd>
           </div>
-          <div>
-            <dt>Entity</dt>
-            <dd>{event.entity_type}<span>{event.entity_id}</span></dd>
-          </div>
-          <div>
-            <dt>Details</dt>
-            <dd>{formatAuditDetails(event)}</dd>
+          <div className="audit-detail-slot">
+            <details className="compact-details audit-details">
+              <summary>View event details</summary>
+              <div className="audit-detail-grid">
+                <span>Entity</span><strong>{event.entity_type} / {event.entity_id}</strong>
+                <span>Details</span><strong>{formatAuditDetails(event)}</strong>
+              </div>
+            </details>
           </div>
         </dl>
       </div>

@@ -32,7 +32,7 @@ export function formatAction(action) {
   const acronyms = {
     sms: 'SMS',
     csv: 'CSV',
-    gmail: 'Gmail'
+    gmail: 'Email'
   };
 
   return action.split('_').map(word => {
