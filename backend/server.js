@@ -72,13 +72,25 @@ const allowedProofMimeTypes = new Set([
   'image/png'
 ]);
 
+const proofFileExtensions = {
+  'application/pdf': '.pdf',
+  'image/jpeg': '.jpg',
+  'image/png': '.png'
+};
+
 const upload = multer({
   dest: uploadDir,
   limits: { fileSize: 5 * 1024 * 1024 }
 });
 
 const proofUpload = multer({
-  dest: uploadDir,
+  storage: multer.diskStorage({
+    destination: uploadDir,
+    filename: (req, file, callback) => {
+      const extension = proofFileExtensions[file.mimetype] || path.extname(file.originalname).toLowerCase();
+      callback(null, `${crypto.randomBytes(16).toString('hex')}${extension}`);
+    }
+  }),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, callback) => {
     if (allowedProofMimeTypes.has(file.mimetype)) {
@@ -826,7 +838,11 @@ function buildStudentTicketResponse(caseRecord) {
           proof_file: caseRecord.correction.proof_file
             ? {
                 original_name: caseRecord.correction.proof_file.original_name,
-                url: caseRecord.correction.proof_file.url
+                url: caseRecord.correction.proof_file.url,
+                mime_type: caseRecord.correction.proof_file.mime_type,
+                size_bytes: caseRecord.correction.proof_file.size_bytes,
+                sha256: caseRecord.correction.proof_file.sha256,
+                validation_status: caseRecord.correction.proof_file.validation_status
               }
             : null
         }
